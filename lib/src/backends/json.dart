@@ -49,7 +49,7 @@ Future<List<SearchResult>> textApi(
   final cache = <String>{};
   final results = <SearchResult>[];
 
-  Future<List<SearchResult>> _textApiPage(int s) async {
+  Future<List<SearchResult>> textApiPage(int s) async {
     payload['s'] = '$s';
 
     var uri = Uri.https("links.duckduckgo.com", "/d.js", payload);
@@ -87,7 +87,7 @@ Future<List<SearchResult>> textApi(
   }
 
   for (final s in slist) {
-    final r = await _textApiPage(s);
+    final r = await textApiPage(s);
     results.addAll(r);
   }
 
