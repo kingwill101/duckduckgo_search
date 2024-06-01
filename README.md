@@ -1,5 +1,3 @@
-Sure! Here's a draft for the README file for the DuduckGoSearch Dart library:
-
 # duckduckgo_search
 
 DuduckGoSearch is a Dart port of the Python [duckduckgo_search](https://github.com/deedy5/duckduckgo_search/) library. It provides functionality to make queries via the DuckDuckGo API.
