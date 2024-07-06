@@ -2,6 +2,48 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'answer.g.dart';
 
+
+class InfoboxConverter implements JsonConverter<Infobox?, dynamic> {
+  const InfoboxConverter();
+
+  @override
+  Infobox? fromJson(dynamic json) {
+    if (json is String && json.isEmpty) {
+      return null; // or return an empty Infobox instance if preferred
+    }
+    if (json is Map<String, dynamic>) {
+      return Infobox.fromJson(json);
+    }
+    return null;
+  }
+
+  @override
+  dynamic toJson(Infobox? object) {
+    return object?.toJson();
+  }
+}
+
+class EmptyStringToNullNumberConverter implements JsonConverter<int?, dynamic> {
+  const EmptyStringToNullNumberConverter();
+
+  @override
+  int? fromJson(dynamic json) {
+    if (json is String && json.isEmpty) {
+      return null;
+    }
+    if (json is int) {
+      return json;
+    }
+    return null;
+  }
+
+  @override
+  dynamic toJson(int? object) {
+    return object;
+  }
+}
+
+
 @JsonSerializable()
 class Answer {
   @JsonKey(name: "Abstract")
@@ -29,12 +71,15 @@ class Answer {
   @JsonKey(name: "Image")
   final String? image;
   @JsonKey(name: "ImageHeight")
+  @EmptyStringToNullNumberConverter()
   final int? imageHeight;
   @JsonKey(name: "ImageIsLogo")
   final int? imageIsLogo;
   @JsonKey(name: "ImageWidth")
+  @EmptyStringToNullNumberConverter()
   final int? imageWidth;
   @JsonKey(name: "Infobox")
+  @InfoboxConverter()
   final Infobox? infobox;
   @JsonKey(name: "Redirect")
   final String? redirect;

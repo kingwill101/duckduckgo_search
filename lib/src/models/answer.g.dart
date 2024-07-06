@@ -19,12 +19,10 @@ Answer _$AnswerFromJson(Map<String, dynamic> json) => Answer(
       entity: json['Entity'] as String?,
       heading: json['Heading'] as String?,
       image: json['Image'] as String?,
-      imageHeight: (json['ImageHeight'] as num?)?.toInt(),
+      imageHeight: (json['ImageHeight'] as num?)?.toInt() ?? 0,
       imageIsLogo: (json['ImageIsLogo'] as num?)?.toInt(),
-      imageWidth: (json['ImageWidth'] as num?)?.toInt(),
-      infobox: json['Infobox'] == null
-          ? null
-          : Infobox.fromJson(json['Infobox'] as Map<String, dynamic>),
+      imageWidth: (json['ImageWidth'] as num?)?.toInt() ?? 0,
+      infobox: const InfoboxConverter().fromJson(json['Infobox']),
       redirect: json['Redirect'] as String?,
       relatedTopics: (json['RelatedTopics'] as List<dynamic>?)
           ?.map((e) => RelatedTopic.fromJson(e as Map<String, dynamic>))
@@ -52,7 +50,7 @@ Map<String, dynamic> _$AnswerToJson(Answer instance) => <String, dynamic>{
       'ImageHeight': instance.imageHeight,
       'ImageIsLogo': instance.imageIsLogo,
       'ImageWidth': instance.imageWidth,
-      'Infobox': instance.infobox,
+      'Infobox': const InfoboxConverter().toJson(instance.infobox),
       'Redirect': instance.redirect,
       'RelatedTopics': instance.relatedTopics,
       'Results': instance.results,
