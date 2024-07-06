@@ -1,7 +1,7 @@
 name: duckduckgo_search
 description: DuckDuckGo Search API for Dart
-version: 0.1.0
-repository: https://github.com/kingwill101/duckduckgo_dart
+version: 0.1.1
+repository: https://github.com/kingwill101/duckduckgo_search/
 
 environment:
   sdk: ">=3.4.1 <4.0.0"

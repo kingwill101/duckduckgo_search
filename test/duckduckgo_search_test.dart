@@ -27,5 +27,15 @@ void main() {
     test('get answers', () async {
       expect((await search.answers('reddit.com')).toJson(), isNotEmpty);
     });
+
+    test('get answers without quick answers', () async {
+      expect((await search.answers('tesla')).toJson(), isNotEmpty);
+    });
+
+    group('issues', () {
+      test('#1', () async {
+        expect(await search.text('who is the ceo of tesla'), isNotEmpty);
+      });
+    });
   });
 }
