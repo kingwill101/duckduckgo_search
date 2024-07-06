@@ -14,7 +14,7 @@ Add the following dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  duduckgo_search: ^0.1.0
+  duduckgo_search: ^0.1.1
 ```
 
 
@@ -74,6 +74,3 @@ See the CHANGELOG file for version history.
 
 ### Acknowledgements
 This library is a Dart port of the Python [duckduckgo_search](https://github.com/deedy5/duckduckgo_search/) library.
-
-
-Feel free to customize this README further based on the specific details and requirements of your project.
