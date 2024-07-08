@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'answer.g.dart';
 
-
 class InfoboxConverter implements JsonConverter<Infobox?, dynamic> {
   const InfoboxConverter();
 
@@ -43,52 +42,72 @@ class EmptyStringToNullNumberConverter implements JsonConverter<int?, dynamic> {
   }
 }
 
-
 @JsonSerializable()
 class Answer {
   @JsonKey(name: "Abstract")
   final String? answerAbstract;
+
   @JsonKey(name: "AbstractSource")
   final String? abstractSource;
+
   @JsonKey(name: "AbstractText")
   final String? abstractText;
+
   @JsonKey(name: "AbstractURL")
   final String? abstractUrl;
+
   @JsonKey(name: "Answer")
   final String? answer;
+
   @JsonKey(name: "AnswerType")
   final String? answerType;
+
   @JsonKey(name: "Definition")
   final String? definition;
+
   @JsonKey(name: "DefinitionSource")
   final String? definitionSource;
+
   @JsonKey(name: "DefinitionURL")
   final String? definitionUrl;
+
   @JsonKey(name: "Entity")
   final String? entity;
+
   @JsonKey(name: "Heading")
   final String? heading;
+
   @JsonKey(name: "Image")
   final String? image;
+
   @JsonKey(name: "ImageHeight")
   @EmptyStringToNullNumberConverter()
   final int? imageHeight;
+
   @JsonKey(name: "ImageIsLogo")
+  @EmptyStringToNullNumberConverter()
   final int? imageIsLogo;
+
   @JsonKey(name: "ImageWidth")
   @EmptyStringToNullNumberConverter()
   final int? imageWidth;
+
   @JsonKey(name: "Infobox")
   @InfoboxConverter()
   final Infobox? infobox;
+
   @JsonKey(name: "Redirect")
   final String? redirect;
+
   @JsonKey(name: "RelatedTopics")
   final List<RelatedTopic>? relatedTopics;
+
   @JsonKey(name: "Results")
   final List<dynamic>? results;
+
   @JsonKey(name: "Type")
   final String? type;
+
   @JsonKey(name: "meta")
   final AnswerMeta? meta;
 
@@ -125,6 +144,7 @@ class Answer {
 class Infobox {
   @JsonKey(name: "content")
   final List<Content>? content;
+
   @JsonKey(name: "meta")
   final List<MetaElement>? meta;
 
@@ -143,10 +163,13 @@ class Infobox {
 class Content {
   @JsonKey(name: "data_type")
   final String? dataType;
+
   @JsonKey(name: "label")
   final String? label;
+
   @JsonKey(name: "value")
   final dynamic value;
+
   @JsonKey(name: "wiki_order")
   final dynamic wikiOrder;
 
@@ -167,9 +190,12 @@ class Content {
 class ValueClass {
   @JsonKey(name: "entity-type")
   final String? entityType;
+
   @JsonKey(name: "id")
   final String? id;
+
   @JsonKey(name: "numeric-id")
+  @EmptyStringToNullNumberConverter()
   final int? numericId;
 
   ValueClass({
@@ -188,8 +214,10 @@ class ValueClass {
 class MetaElement {
   @JsonKey(name: "data_type")
   final String? dataType;
+
   @JsonKey(name: "label")
   final String? label;
+
   @JsonKey(name: "value")
   final String? value;
 
@@ -209,61 +237,90 @@ class MetaElement {
 class AnswerMeta {
   @JsonKey(name: "attribution")
   final dynamic attribution;
+
   @JsonKey(name: "blockgroup")
   final dynamic blockgroup;
+
   @JsonKey(name: "created_date")
   final dynamic createdDate;
+
   @JsonKey(name: "description")
   final String? description;
+
   @JsonKey(name: "designer")
   final dynamic designer;
+
   @JsonKey(name: "dev_date")
   final dynamic devDate;
+
   @JsonKey(name: "dev_milestone")
   final String? devMilestone;
+
   @JsonKey(name: "developer")
   final List<Developer>? developer;
+
   @JsonKey(name: "example_query")
   final String? exampleQuery;
+
   @JsonKey(name: "id")
   final String? id;
+
   @JsonKey(name: "is_stackexchange")
   final dynamic isStackexchange;
+
   @JsonKey(name: "js_callback_name")
   final String? jsCallbackName;
+
   @JsonKey(name: "live_date")
   final dynamic liveDate;
+
   @JsonKey(name: "maintainer")
   final Maintainer? maintainer;
+
   @JsonKey(name: "name")
   final String? name;
+
   @JsonKey(name: "perl_module")
   final String? perlModule;
+
   @JsonKey(name: "producer")
   final dynamic producer;
+
   @JsonKey(name: "production_state")
   final String? productionState;
+
   @JsonKey(name: "repo")
   final String? repo;
+
   @JsonKey(name: "signal_from")
   final String? signalFrom;
   @JsonKey(name: "src_domain")
   final String? srcDomain;
+
   @JsonKey(name: "src_id")
+  @EmptyStringToNullNumberConverter()
   final int? srcId;
+
   @JsonKey(name: "src_name")
   final String? srcName;
+
   @JsonKey(name: "src_options")
   final SrcOptions? srcOptions;
+
   @JsonKey(name: "src_url")
   final dynamic srcUrl;
+
   @JsonKey(name: "status")
   final String? status;
+
   @JsonKey(name: "tab")
   final String? tab;
+
   @JsonKey(name: "topic")
   final List<String>? topic;
+
   @JsonKey(name: "unsafe")
+  @EmptyStringToNullNumberConverter()
   final int? unsafe;
 
   AnswerMeta({
@@ -308,8 +365,10 @@ class AnswerMeta {
 class Developer {
   @JsonKey(name: "name")
   final String? name;
+
   @JsonKey(name: "type")
   final String? type;
+
   @JsonKey(name: "url")
   final String? url;
 
@@ -344,30 +403,51 @@ class Maintainer {
 class SrcOptions {
   @JsonKey(name: "directory")
   final String? directory;
+
   @JsonKey(name: "is_fanon")
+  @EmptyStringToNullNumberConverter()
   final int? isFanon;
+
   @JsonKey(name: "is_mediawiki")
+  @EmptyStringToNullNumberConverter()
   final int? isMediawiki;
+
   @JsonKey(name: "is_wikipedia")
+  @EmptyStringToNullNumberConverter()
   final int? isWikipedia;
+
   @JsonKey(name: "language")
   final String? language;
+
   @JsonKey(name: "min_abstract_length")
   final String? minAbstractLength;
+
   @JsonKey(name: "skip_abstract")
+  @EmptyStringToNullNumberConverter()
   final int? skipAbstract;
+
   @JsonKey(name: "skip_abstract_paren")
+  @EmptyStringToNullNumberConverter()
   final int? skipAbstractParen;
+
   @JsonKey(name: "skip_end")
+  @EmptyStringToNullNumberConverter()
   final String? skipEnd;
+
   @JsonKey(name: "skip_icon")
+  @EmptyStringToNullNumberConverter()
   final int? skipIcon;
+
   @JsonKey(name: "skip_image_name")
+  @EmptyStringToNullNumberConverter()
   final int? skipImageName;
+
   @JsonKey(name: "skip_qr")
   final String? skipQr;
+
   @JsonKey(name: "source_skip")
   final String? sourceSkip;
+
   @JsonKey(name: "src_info")
   final String? srcInfo;
 

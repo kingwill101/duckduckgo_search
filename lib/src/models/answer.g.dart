@@ -19,9 +19,12 @@ Answer _$AnswerFromJson(Map<String, dynamic> json) => Answer(
       entity: json['Entity'] as String?,
       heading: json['Heading'] as String?,
       image: json['Image'] as String?,
-      imageHeight: (json['ImageHeight'] as num?)?.toInt() ?? 0,
-      imageIsLogo: (json['ImageIsLogo'] as num?)?.toInt(),
-      imageWidth: (json['ImageWidth'] as num?)?.toInt() ?? 0,
+      imageHeight: const EmptyStringToNullNumberConverter()
+          .fromJson(json['ImageHeight']),
+      imageIsLogo: const EmptyStringToNullNumberConverter()
+          .fromJson(json['ImageIsLogo']),
+      imageWidth:
+          const EmptyStringToNullNumberConverter().fromJson(json['ImageWidth']),
       infobox: const InfoboxConverter().fromJson(json['Infobox']),
       redirect: json['Redirect'] as String?,
       relatedTopics: (json['RelatedTopics'] as List<dynamic>?)
@@ -47,9 +50,12 @@ Map<String, dynamic> _$AnswerToJson(Answer instance) => <String, dynamic>{
       'Entity': instance.entity,
       'Heading': instance.heading,
       'Image': instance.image,
-      'ImageHeight': instance.imageHeight,
-      'ImageIsLogo': instance.imageIsLogo,
-      'ImageWidth': instance.imageWidth,
+      'ImageHeight':
+          const EmptyStringToNullNumberConverter().toJson(instance.imageHeight),
+      'ImageIsLogo':
+          const EmptyStringToNullNumberConverter().toJson(instance.imageIsLogo),
+      'ImageWidth':
+          const EmptyStringToNullNumberConverter().toJson(instance.imageWidth),
       'Infobox': const InfoboxConverter().toJson(instance.infobox),
       'Redirect': instance.redirect,
       'RelatedTopics': instance.relatedTopics,
@@ -89,14 +95,16 @@ Map<String, dynamic> _$ContentToJson(Content instance) => <String, dynamic>{
 ValueClass _$ValueClassFromJson(Map<String, dynamic> json) => ValueClass(
       entityType: json['entity-type'] as String?,
       id: json['id'] as String?,
-      numericId: (json['numeric-id'] as num?)?.toInt(),
+      numericId:
+          const EmptyStringToNullNumberConverter().fromJson(json['numeric-id']),
     );
 
 Map<String, dynamic> _$ValueClassToJson(ValueClass instance) =>
     <String, dynamic>{
       'entity-type': instance.entityType,
       'id': instance.id,
-      'numeric-id': instance.numericId,
+      'numeric-id':
+          const EmptyStringToNullNumberConverter().toJson(instance.numericId),
     };
 
 MetaElement _$MetaElementFromJson(Map<String, dynamic> json) => MetaElement(
@@ -138,7 +146,7 @@ AnswerMeta _$AnswerMetaFromJson(Map<String, dynamic> json) => AnswerMeta(
       repo: json['repo'] as String?,
       signalFrom: json['signal_from'] as String?,
       srcDomain: json['src_domain'] as String?,
-      srcId: (json['src_id'] as num?)?.toInt(),
+      srcId: const EmptyStringToNullNumberConverter().fromJson(json['src_id']),
       srcName: json['src_name'] as String?,
       srcOptions: json['src_options'] == null
           ? null
@@ -148,7 +156,7 @@ AnswerMeta _$AnswerMetaFromJson(Map<String, dynamic> json) => AnswerMeta(
       tab: json['tab'] as String?,
       topic:
           (json['topic'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      unsafe: (json['unsafe'] as num?)?.toInt(),
+      unsafe: const EmptyStringToNullNumberConverter().fromJson(json['unsafe']),
     );
 
 Map<String, dynamic> _$AnswerMetaToJson(AnswerMeta instance) =>
@@ -174,14 +182,15 @@ Map<String, dynamic> _$AnswerMetaToJson(AnswerMeta instance) =>
       'repo': instance.repo,
       'signal_from': instance.signalFrom,
       'src_domain': instance.srcDomain,
-      'src_id': instance.srcId,
+      'src_id': const EmptyStringToNullNumberConverter().toJson(instance.srcId),
       'src_name': instance.srcName,
       'src_options': instance.srcOptions,
       'src_url': instance.srcUrl,
       'status': instance.status,
       'tab': instance.tab,
       'topic': instance.topic,
-      'unsafe': instance.unsafe,
+      'unsafe':
+          const EmptyStringToNullNumberConverter().toJson(instance.unsafe),
     };
 
 Developer _$DeveloperFromJson(Map<String, dynamic> json) => Developer(
@@ -207,16 +216,23 @@ Map<String, dynamic> _$MaintainerToJson(Maintainer instance) =>
 
 SrcOptions _$SrcOptionsFromJson(Map<String, dynamic> json) => SrcOptions(
       directory: json['directory'] as String?,
-      isFanon: (json['is_fanon'] as num?)?.toInt(),
-      isMediawiki: (json['is_mediawiki'] as num?)?.toInt(),
-      isWikipedia: (json['is_wikipedia'] as num?)?.toInt(),
+      isFanon:
+          const EmptyStringToNullNumberConverter().fromJson(json['is_fanon']),
+      isMediawiki: const EmptyStringToNullNumberConverter()
+          .fromJson(json['is_mediawiki']),
+      isWikipedia: const EmptyStringToNullNumberConverter()
+          .fromJson(json['is_wikipedia']),
       language: json['language'] as String?,
       minAbstractLength: json['min_abstract_length'] as String?,
-      skipAbstract: (json['skip_abstract'] as num?)?.toInt(),
-      skipAbstractParen: (json['skip_abstract_paren'] as num?)?.toInt(),
+      skipAbstract: const EmptyStringToNullNumberConverter()
+          .fromJson(json['skip_abstract']),
+      skipAbstractParen: const EmptyStringToNullNumberConverter()
+          .fromJson(json['skip_abstract_paren']),
       skipEnd: json['skip_end'] as String?,
-      skipIcon: (json['skip_icon'] as num?)?.toInt(),
-      skipImageName: (json['skip_image_name'] as num?)?.toInt(),
+      skipIcon:
+          const EmptyStringToNullNumberConverter().fromJson(json['skip_icon']),
+      skipImageName: const EmptyStringToNullNumberConverter()
+          .fromJson(json['skip_image_name']),
       skipQr: json['skip_qr'] as String?,
       sourceSkip: json['source_skip'] as String?,
       srcInfo: json['src_info'] as String?,
@@ -225,16 +241,23 @@ SrcOptions _$SrcOptionsFromJson(Map<String, dynamic> json) => SrcOptions(
 Map<String, dynamic> _$SrcOptionsToJson(SrcOptions instance) =>
     <String, dynamic>{
       'directory': instance.directory,
-      'is_fanon': instance.isFanon,
-      'is_mediawiki': instance.isMediawiki,
-      'is_wikipedia': instance.isWikipedia,
+      'is_fanon':
+          const EmptyStringToNullNumberConverter().toJson(instance.isFanon),
+      'is_mediawiki':
+          const EmptyStringToNullNumberConverter().toJson(instance.isMediawiki),
+      'is_wikipedia':
+          const EmptyStringToNullNumberConverter().toJson(instance.isWikipedia),
       'language': instance.language,
       'min_abstract_length': instance.minAbstractLength,
-      'skip_abstract': instance.skipAbstract,
-      'skip_abstract_paren': instance.skipAbstractParen,
+      'skip_abstract': const EmptyStringToNullNumberConverter()
+          .toJson(instance.skipAbstract),
+      'skip_abstract_paren': const EmptyStringToNullNumberConverter()
+          .toJson(instance.skipAbstractParen),
       'skip_end': instance.skipEnd,
-      'skip_icon': instance.skipIcon,
-      'skip_image_name': instance.skipImageName,
+      'skip_icon':
+          const EmptyStringToNullNumberConverter().toJson(instance.skipIcon),
+      'skip_image_name': const EmptyStringToNullNumberConverter()
+          .toJson(instance.skipImageName),
       'skip_qr': instance.skipQr,
       'source_skip': instance.sourceSkip,
       'src_info': instance.srcInfo,
