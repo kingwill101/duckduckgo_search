@@ -14,7 +14,7 @@ Add the following dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  duduckgo_search: ^0.1.1
+  duckduckgo_search: ^0.1.1
 ```
 
 
@@ -23,7 +23,7 @@ Then, run `flutter pub get` or `dart pub get` to install the package.
 ### Usage
 Import the package in your Dart file:
 ```
-import 'package:duduckgo_search/duduckgo_search.dart';
+import 'package:duckduckgo_search /duckduckgo_search.dart';
 ```
 
 Perform a search:
