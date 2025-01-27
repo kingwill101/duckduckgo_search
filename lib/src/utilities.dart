@@ -5,6 +5,7 @@ import 'package:html/parser.dart' as htmlParser;
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 
+
 /// Normalizes a raw HTML string by stripping HTML tags and unescaping HTML entities.
 ///
 /// If the [rawHtml] parameter is `null` or an empty string, an empty string is returned.
@@ -21,7 +22,7 @@ import 'package:http/http.dart' as http;
 /// The normalized string with HTML tags removed and HTML entities unescaped.
 String normalize(String? rawHtml) {
   if (rawHtml == null || rawHtml.isEmpty) return "";
-  var parsedHtml = htmlParser.parse(rawHtml).body?.text ?? '';
+  var parsedHtml  = htmlParser.parse(rawHtml).body?.text ?? '';
   return parsedHtml;
 }
 
@@ -54,7 +55,8 @@ String normalizeUrl(String? url) {
 /// Returns:
 ///   Future<String>: The VQD value as a string.
 Future<String> getVqd(String keywords) async {
-  var data = await http.post(Uri.parse('https://duckduckgo.com'), body: {'q': keywords});
+  var data = await http
+      .post(Uri.parse('https://duckduckgo.com'), body: {'q': keywords});
 
   return _extractVqd(data.body, keywords);
 }
@@ -86,9 +88,11 @@ String _extractVqd(String respContent, String keywords) {
     if (vqd == null) throw DuckDuckGoSearchException('vqd value is null');
     return vqd;
   } else {
-    throw DuckDuckGoSearchException('_extractVqd() failed to extract vqd for: $keywords');
+    throw DuckDuckGoSearchException(
+        '_extractVqd() failed to extract vqd for: $keywords');
   }
 }
+
 
 /// Extracts a list of dynamic objects from a JSON string within a larger string.
 ///
@@ -102,11 +106,11 @@ List<dynamic> textExtractJson(String content, String keywords) {
   int start = content.indexOf("DDG.pageLayout.load('d',") + 24;
   // int end = content.indexOf(");DDG.duckbar.load(", start);
 
-// End condition 1: );DDG.duckbar.load(
+  // End condition 1: );DDG.duckbar.load(
   int end1 = content.indexOf(");DDG.duckbar.load(", start);
-// End condition 2: );DDG.duckbar.loadModule(
+  // End condition 2: );DDG.duckbar.loadModule(
   int end2 = content.indexOf(");DDG.duckbar.loadModule(", start);
-// Select the earliest end position
+  // Select the earliest end position
   int end;
   if (end1 != -1 && (end2 == -1 || end1 < end2)) {
     end = end1;
