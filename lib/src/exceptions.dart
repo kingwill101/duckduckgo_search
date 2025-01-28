@@ -15,6 +15,3 @@ class RateLimitException extends DuckDuckGoSearchException {
 class TimeoutException extends DuckDuckGoSearchException {
   TimeoutException([super.message = 'request timeout']);
 }
-
-
-

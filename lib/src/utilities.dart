@@ -5,7 +5,6 @@ import 'package:html/parser.dart' as htmlParser;
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 
-
 /// Normalizes a raw HTML string by stripping HTML tags and unescaping HTML entities.
 ///
 /// If the [rawHtml] parameter is `null` or an empty string, an empty string is returned.
@@ -22,7 +21,7 @@ import 'package:http/http.dart' as http;
 /// The normalized string with HTML tags removed and HTML entities unescaped.
 String normalize(String? rawHtml) {
   if (rawHtml == null || rawHtml.isEmpty) return "";
-  var parsedHtml  = htmlParser.parse(rawHtml).body?.text ?? '';
+  var parsedHtml = htmlParser.parse(rawHtml).body?.text ?? '';
   return parsedHtml;
 }
 
@@ -92,7 +91,6 @@ String _extractVqd(String respContent, String keywords) {
         '_extractVqd() failed to extract vqd for: $keywords');
   }
 }
-
 
 /// Extracts a list of dynamic objects from a JSON string within a larger string.
 ///
