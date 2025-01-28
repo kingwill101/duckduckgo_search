@@ -5,7 +5,6 @@ import 'package:html/parser.dart' as htmlParser;
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 
-
 /// Normalizes a raw HTML string by stripping HTML tags and unescaping HTML entities.
 ///
 /// If the [rawHtml] parameter is `null` or an empty string, an empty string is returned.
@@ -22,7 +21,7 @@ import 'package:http/http.dart' as http;
 /// The normalized string with HTML tags removed and HTML entities unescaped.
 String normalize(String? rawHtml) {
   if (rawHtml == null || rawHtml.isEmpty) return "";
-  var parsedHtml  = htmlParser.parse(rawHtml).body?.text ?? '';
+  var parsedHtml = htmlParser.parse(rawHtml).body?.text ?? '';
   return parsedHtml;
 }
 
@@ -93,7 +92,6 @@ String _extractVqd(String respContent, String keywords) {
   }
 }
 
-
 /// Extracts a list of dynamic objects from a JSON string within a larger string.
 ///
 /// This function takes a [content] string and a [keywords] string, and extracts a
@@ -104,7 +102,22 @@ String _extractVqd(String respContent, String keywords) {
 /// The extracted list is returned as a [List<dynamic>].
 List<dynamic> textExtractJson(String content, String keywords) {
   int start = content.indexOf("DDG.pageLayout.load('d',") + 24;
-  int end = content.indexOf(");DDG.duckbar.load(", start);
+  // int end = content.indexOf(");DDG.duckbar.load(", start);
+
+  // End condition 1: );DDG.duckbar.load(
+  int end1 = content.indexOf(");DDG.duckbar.load(", start);
+  // End condition 2: );DDG.duckbar.loadModule(
+  int end2 = content.indexOf(");DDG.duckbar.loadModule(", start);
+  // Select the earliest end position
+  int end;
+  if (end1 != -1 && (end2 == -1 || end1 < end2)) {
+    end = end1;
+  } else if (end2 != -1) {
+    end = end2;
+  } else {
+    throw ArgumentError("End tag not found.");
+  }
+
   String data = content.substring(start, end);
   var aa = jsonDecode(data) as List<dynamic>;
   return aa;
