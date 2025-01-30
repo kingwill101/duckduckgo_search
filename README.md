@@ -14,7 +14,7 @@ Add the following dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  duckduckgo_search: ^0.1.1
+  duckduckgo_search: ^0.1.4
 ```
 
 
