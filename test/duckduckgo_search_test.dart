@@ -1,5 +1,6 @@
 import 'package:duckduckgo_search/duckduckgo_search.dart';
 import 'package:duckduckgo_search/src/models/video_result.dart';
+import 'package:duckduckgo_search/src/models/news_result.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -132,6 +133,52 @@ void main() {
     test('video search with different safesearch levels', () async {
       var results = await search.videos(
         'educational content',
+        safesearch: 'strict',
+      );
+      expect(results, isNotEmpty);
+    });
+  });
+
+  group('News search', () {
+    test('basic news search', () async {
+      var results = await search.news('dart programming language');
+      expect(results, isNotEmpty);
+      expect(results.first.title, isNotEmpty);
+      expect(results.first.body, isNotEmpty);
+      expect(results.first.date, isA<DateTime>());
+      expect(results.first.url, contains('http'));
+      expect(results.first.source, isNotEmpty);
+    });
+
+    test('news search with timelimit', () async {
+      var results = await search.news(
+        'technology news',
+        timelimit: 'd',
+        maxResults: 5,
+      );
+      expect(results, isNotEmpty);
+      expect(results.length, lessThanOrEqualTo(5));
+    });
+
+    test('news search respects maxResults', () async {
+      var maxResults = 3;
+      var results = await search.news(
+        'science discoveries',
+        maxResults: maxResults,
+      );
+      expect(results.length, lessThanOrEqualTo(maxResults));
+    });
+
+    test('news search handles empty keywords', () async {
+      expect(
+        () => search.news(''),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('news search with different safesearch levels', () async {
+      var results = await search.news(
+        'world news',
         safesearch: 'strict',
       );
       expect(results, isNotEmpty);

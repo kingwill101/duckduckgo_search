@@ -7,6 +7,7 @@ import 'package:duckduckgo_search/src/models/answer.dart';
 import 'package:duckduckgo_search/src/models/search_result.dart';
 import 'package:duckduckgo_search/src/models/image_result.dart';
 import 'package:duckduckgo_search/src/models/video_result.dart';
+import 'package:duckduckgo_search/src/models/news_result.dart';
 import 'dart:convert';
 import 'backends/lite.dart';
 import 'utilities.dart';
@@ -304,7 +305,7 @@ class DuckDuckGoSearch {
       );
 
       final respJson =
-          json.decode(response.data.toString()) as Map<String, dynamic>;
+          json.decode(response.data) as Map<String, dynamic>;
       final pageData = respJson['results'] as List<dynamic>? ?? [];
 
       for (final row in pageData) {
@@ -398,7 +399,7 @@ class DuckDuckGoSearch {
       );
 
       final respJson =
-          json.decode(response.data.toString()) as Map<String, dynamic>;
+          json.decode(response.data) as Map<String, dynamic>;
       final pageData = respJson['results'] as List<dynamic>? ?? [];
 
       for (final row in pageData) {
@@ -406,6 +407,82 @@ class DuckDuckGoSearch {
         if (!cache.contains(content)) {
           cache.add(content);
           results.add(VideoResult.fromJson(row));
+          if (maxResults != null && results.length >= maxResults) {
+            return results;
+          }
+        }
+      }
+
+      final next = respJson['next'] as String?;
+      if (next == null || maxResults == null) {
+        return results;
+      }
+
+      // Update payload with next page token
+      payload['s'] = next.split('s=')[1].split('&')[0];
+    }
+
+    return results;
+  }
+
+  /// DuckDuckGo news search. Query params: https://duckduckgo.com/params
+  ///
+  /// Args:
+  ///   keywords: keywords for query.
+  ///   region: wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".
+  ///   safesearch: on, moderate, off. Defaults to "moderate".
+  ///   timelimit: d, w, m. Defaults to null.
+  ///   maxResults: max number of results. If null, returns results only from the first response.
+  ///
+  /// Returns:
+  ///   List of NewsResult objects with news search results.
+  Future<List<NewsResult>> news(
+    String keywords, {
+    String region = 'wt-wt',
+    String safesearch = 'moderate',
+    String? timelimit,
+    int? maxResults,
+  }) async {
+    assert(keywords.isNotEmpty, 'keywords is mandatory');
+
+    final vqd = await getVqd(keywords);
+    final safesearchBase = {
+      'on': '1',
+      'moderate': '-1',
+      'off': '-2',
+    };
+
+    final payload = {
+      'l': region,
+      'o': 'json',
+      'noamp': '1',
+      'q': keywords,
+      'vqd': vqd,
+      'p': safesearchBase[safesearch.toLowerCase()],
+    };
+
+    if (timelimit != null) {
+      payload['df'] = timelimit;
+    }
+
+    final cache = <String>{};
+    final results = <NewsResult>[];
+
+    for (var i = 0; i < 5; i++) {
+      final response = await _dio.get(
+        'https://duckduckgo.com/news.js',
+        queryParameters: payload,
+      );
+
+      final respJson = response.data as Map<String, dynamic>;
+      final pageData = respJson['results'] as List<dynamic>? ?? [];
+
+      for (final row in pageData) {
+        final url = row['url'] as String?;
+        if (url != null && !cache.contains(url)) {
+          cache.add(url);
+          results.add(NewsResult.fromMap(row));
+
           if (maxResults != null && results.length >= maxResults) {
             return results;
           }
