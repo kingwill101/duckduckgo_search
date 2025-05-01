@@ -2,13 +2,17 @@
 
 ## 0.2.0
 
+* Added news search support with filters:
+* Added video search support with filters:
 * Added image search support with filters for size, color, type, layout, and license
-* Added sleep between requests (0.75s) to prevent rate limiting
+* Added sleep between requests to help prevent rate limiting
 * Improved error handling:
   * Better detection and reporting of rate limits (status codes 202, 301, 403, 400, 429, 418)
   * Proper timeout error handling
   * More descriptive error messages with URLs and status codes
 * Added User-Agent header to better mimic browser requests
+* Added pagination and caching to prevent duplicate results
+* Added comprehensive test suites for news, video and image search
 
 ## 0.1.4
 - Support both DuckDuckGo response formats for JSON extraction #6 
