@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:duckduckgo_search/src/exceptions.dart';
-import 'package:html/parser.dart' as htmlParser;
+import 'package:html/parser.dart' as html_parser;
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,7 +21,7 @@ import 'package:http/http.dart' as http;
 /// The normalized string with HTML tags removed and HTML entities unescaped.
 String normalize(String? rawHtml) {
   if (rawHtml == null || rawHtml.isEmpty) return "";
-  var parsedHtml = htmlParser.parse(rawHtml).body?.text ?? '';
+  var parsedHtml = html_parser.parse(rawHtml).body?.text ?? '';
   return parsedHtml;
 }
 

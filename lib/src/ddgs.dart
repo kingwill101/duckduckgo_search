@@ -6,6 +6,7 @@ import 'package:duckduckgo_search/src/backends/json.dart';
 import 'package:duckduckgo_search/src/models/answer.dart';
 import 'package:duckduckgo_search/src/models/search_result.dart';
 import 'package:duckduckgo_search/src/models/image_result.dart';
+import 'package:duckduckgo_search/src/models/video_result.dart';
 import 'dart:convert';
 import 'backends/lite.dart';
 import 'utilities.dart';
@@ -23,9 +24,11 @@ class DuckDuckGoSearch {
     this.timeout = 10000,
   })  : headers = headers ?? {},
         _dio = Dio(BaseOptions(
-          headers: headers ?? {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          },
+          headers: headers ??
+              {
+                'User-Agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              },
           connectTimeout: Duration(seconds: 30),
           receiveTimeout: Duration(seconds: 30),
         )) {
@@ -43,17 +46,18 @@ class DuckDuckGoSearch {
       },
       onResponse: (response, handler) {
         final url = response.requestOptions.uri.toString();
-        
+
         if (response.statusCode == 200) {
           return handler.next(response);
         }
-        
+
         // Handle rate limits and related errors
         if ([202, 301, 403, 400, 429, 418].contains(response.statusCode)) {
           return handler.reject(
             DioException(
               requestOptions: response.requestOptions,
-              error: RateLimitException('$url ${response.statusCode} Ratelimit'),
+              error:
+                  RateLimitException('$url ${response.statusCode} Ratelimit'),
               response: response,
             ),
           );
@@ -72,7 +76,7 @@ class DuckDuckGoSearch {
       },
       onError: (error, handler) {
         final url = error.requestOptions.uri.toString();
-        
+
         // Handle timeout errors
         if (error.type == DioExceptionType.connectionTimeout ||
             error.type == DioExceptionType.receiveTimeout ||
@@ -81,19 +85,22 @@ class DuckDuckGoSearch {
           return handler.reject(
             DioException(
               requestOptions: error.requestOptions,
-              error: TimeoutException('$url ${error.runtimeType}: ${error.message}'),
+              error: TimeoutException(
+                  '$url ${error.runtimeType}: ${error.message}'),
               type: error.type,
             ),
           );
         }
 
         // Handle rate limit errors that might come through error callback
-        if (error.response != null && 
-            [202, 301, 403, 400, 429, 418].contains(error.response?.statusCode)) {
+        if (error.response != null &&
+            [202, 301, 403, 400, 429, 418]
+                .contains(error.response?.statusCode)) {
           return handler.reject(
             DioException(
               requestOptions: error.requestOptions,
-              error: RateLimitException('${error.requestOptions.uri} ${error.response?.statusCode} Ratelimit'),
+              error: RateLimitException(
+                  '${error.requestOptions.uri} ${error.response?.statusCode} Ratelimit'),
               response: error.response,
             ),
           );
@@ -103,7 +110,8 @@ class DuckDuckGoSearch {
         return handler.reject(
           DioException(
             requestOptions: error.requestOptions,
-            error: DuckDuckGoSearchException('$url ${error.runtimeType}: ${error.message}'),
+            error: DuckDuckGoSearchException(
+                '$url ${error.runtimeType}: ${error.message}'),
             type: error.type,
           ),
         );
@@ -114,7 +122,9 @@ class DuckDuckGoSearch {
   /// Sleep between API requests to avoid rate limiting
   Future<void> _sleep([double sleepTime = 0.75]) async {
     final now = DateTime.now().millisecondsSinceEpoch / 1000.0;
-    final delay = _sleepTimestamp == 0.0 || (now - _sleepTimestamp) >= 20 ? 0.0 : sleepTime;
+    final delay = _sleepTimestamp == 0.0 || (now - _sleepTimestamp) >= 20
+        ? 0.0
+        : sleepTime;
     _sleepTimestamp = now;
     if (delay > 0) {
       await Future.delayed(Duration(milliseconds: (delay * 1000).round()));
@@ -287,60 +297,130 @@ class DuckDuckGoSearch {
     final cache = <String>{};
     final results = <ImageResult>[];
 
-    try {
-      for (var i = 0; i < 5; i++) {
-        final response = await _dio.get(
-          'https://duckduckgo.com/i.js',
-          queryParameters: payload,
-        );
+    for (var i = 0; i < 5; i++) {
+      final response = await _dio.get(
+        'https://duckduckgo.com/i.js',
+        queryParameters: payload,
+      );
 
-        final respJson = json.decode(response.data.toString()) as Map<String, dynamic>;
-        final pageData = respJson['results'] as List<dynamic>? ?? [];
+      final respJson =
+          json.decode(response.data.toString()) as Map<String, dynamic>;
+      final pageData = respJson['results'] as List<dynamic>? ?? [];
 
-        for (final row in pageData) {
-          final imageUrl = row['image'] as String?;
-          if (imageUrl != null && !cache.contains(imageUrl)) {
-            cache.add(imageUrl);
-            results.add(ImageResult(
-              title: row['title'] ?? '',
-              image: normalizeUrl(imageUrl),
-              thumbnail: normalizeUrl(row['thumbnail'] ?? ''),
-              url: normalizeUrl(row['url'] ?? ''),
-              height: row['height'] ?? 0,
-              width: row['width'] ?? 0,
-              source: row['source'] ?? '',
-            ));
+      for (final row in pageData) {
+        final imageUrl = row['image'] as String?;
+        if (imageUrl != null && !cache.contains(imageUrl)) {
+          cache.add(imageUrl);
+          results.add(ImageResult(
+            title: row['title'] ?? '',
+            image: normalizeUrl(imageUrl),
+            thumbnail: normalizeUrl(row['thumbnail'] ?? ''),
+            url: normalizeUrl(row['url'] ?? ''),
+            height: row['height'] ?? 0,
+            width: row['width'] ?? 0,
+            source: row['source'] ?? '',
+          ));
 
-            if (maxResults != null && results.length >= maxResults) {
-              return results;
-            }
+          if (maxResults != null && results.length >= maxResults) {
+            return results;
           }
         }
-
-        final next = respJson['next'] as String?;
-        if (next == null || maxResults == null) {
-          return results;
-        }
-
-        // Update payload with next page token
-        payload['s'] = next.split('s=')[1].split('&')[0];
       }
 
-      return results;
-    } catch (e) {
-      if (e is DioException) {
-        if (e.type == DioExceptionType.connectionTimeout ||
-            e.type == DioExceptionType.receiveTimeout ||
-            e.type == DioExceptionType.sendTimeout ||
-            (e.message?.toLowerCase().contains('time') ?? false)) {
-          throw TimeoutException('${e.requestOptions.uri} ${e.runtimeType}: ${e.message}');
-        }
-        if (e.response != null && [202, 301, 403, 400, 429, 418].contains(e.response?.statusCode)) {
-          throw RateLimitException('${e.requestOptions.uri} ${e.response?.statusCode} Ratelimit');
-        }
-        throw DuckDuckGoSearchException('${e.requestOptions.uri} ${e.runtimeType}: ${e.message}');
+      final next = respJson['next'] as String?;
+      if (next == null || maxResults == null) {
+        return results;
       }
-      rethrow;
+
+      // Update payload with next page token
+      payload['s'] = next.split('s=')[1].split('&')[0];
     }
+
+    return results;
+  }
+
+  /// DuckDuckGo videos search. Query params: https://duckduckgo.com/params
+  ///
+  /// Args:
+  ///   keywords: keywords for query.
+  ///   region: wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".
+  ///   safesearch: on, moderate, off. Defaults to "moderate".
+  ///   timelimit: d, w, m. Defaults to null.
+  ///   resolution: high, standart. Defaults to null.
+  ///   duration: short, medium, long. Defaults to null.
+  ///   licenseVideos: creativeCommon, youtube. Defaults to null.
+  ///   maxResults: max number of results. If null, returns results only from the first response.
+  ///
+  /// Returns:
+  ///   List of VideoResult objects with videos search results.
+  Future<List<VideoResult>> videos(
+    String keywords, {
+    String region = 'wt-wt',
+    String safesearch = 'moderate',
+    String? timelimit,
+    String? resolution,
+    String? duration,
+    String? licenseVideos,
+    int? maxResults,
+  }) async {
+    assert(keywords.isNotEmpty, 'keywords is mandatory');
+
+    final vqd = await getVqd(keywords);
+    final safesearchBase = {
+      'on': '1',
+      'moderate': '-1',
+      'off': '-2',
+    };
+
+    final filters = [
+      if (timelimit != null) 'publishedAfter:$timelimit',
+      if (resolution != null) 'videoDefinition:$resolution',
+      if (duration != null) 'videoDuration:$duration',
+      if (licenseVideos != null) 'videoLicense:$licenseVideos',
+    ].join(',');
+
+    final payload = {
+      'l': region,
+      'o': 'json',
+      'q': keywords,
+      'vqd': vqd,
+      'f': filters,
+      'p': safesearchBase[safesearch.toLowerCase()],
+    };
+
+    final results = <VideoResult>[];
+    final cache = <String>{};
+
+    for (var i = 0; i < 8; i++) {
+      final response = await _dio.get(
+        'https://duckduckgo.com/v.js',
+        queryParameters: payload,
+      );
+
+      final respJson =
+          json.decode(response.data.toString()) as Map<String, dynamic>;
+      final pageData = respJson['results'] as List<dynamic>? ?? [];
+
+      for (final row in pageData) {
+        final content = row['content'] as String;
+        if (!cache.contains(content)) {
+          cache.add(content);
+          results.add(VideoResult.fromJson(row));
+          if (maxResults != null && results.length >= maxResults) {
+            return results;
+          }
+        }
+      }
+
+      final next = respJson['next'] as String?;
+      if (next == null || maxResults == null) {
+        return results;
+      }
+
+      // Update payload with next page token
+      payload['s'] = next.split('s=')[1].split('&')[0];
+    }
+
+    return results;
   }
 }

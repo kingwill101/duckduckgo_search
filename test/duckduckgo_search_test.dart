@@ -1,4 +1,5 @@
 import 'package:duckduckgo_search/duckduckgo_search.dart';
+import 'package:duckduckgo_search/src/models/video_result.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -79,6 +80,61 @@ void main() {
       test('#1', () async {
         expect(await search.text('who is the ceo of tesla'), isNotEmpty);
       });
+    });
+  });
+
+  group('Video search', () {
+    test('basic video search', () async {
+      var results = await search.videos('dart programming tutorial');
+      expect(results, isNotEmpty);
+      expect(results.first.title, isNotEmpty);
+      expect(results.first.content, isNotEmpty);
+      expect(results.first.description, isA<String>());
+      expect(results.first.duration, isA<String>());
+      expect(results.first.embedHtml, isA<String>());
+      expect(results.first.provider, isNotEmpty);
+      expect(results.first.published, isA<String>());
+      expect(results.first.statistics, isA<VideoStatistics>());
+      expect(results.first.uploader, isA<String>());
+      expect(results.first.embedUrl, contains('http'));
+      expect(results.first.images, isA<Map<String, dynamic>>());
+      expect(results.first.images.length, greaterThan(0));
+    });
+
+    test('video search with filters', () async {
+      var results = await search.videos(
+        'nature documentary',
+        resolution: 'high',
+        duration: 'long',
+        timelimit: 'm',
+        maxResults: 5,
+      );
+      expect(results, isNotEmpty);
+      expect(results.length, lessThanOrEqualTo(5));
+    });
+
+    test('video search respects maxResults', () async {
+      var maxResults = 3;
+      var results = await search.videos(
+        'cooking tutorials',
+        maxResults: maxResults,
+      );
+      expect(results.length, lessThanOrEqualTo(maxResults));
+    });
+
+    test('video search handles empty keywords', () async {
+      expect(
+        () => search.videos(''),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('video search with different safesearch levels', () async {
+      var results = await search.videos(
+        'educational content',
+        safesearch: 'strict',
+      );
+      expect(results, isNotEmpty);
     });
   });
 }
