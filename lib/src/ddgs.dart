@@ -13,6 +13,7 @@ class DuckDuckGoSearch {
   final String? proxy;
   final Map<String, String> headers;
   final int timeout;
+  double _sleepTimestamp = 0.0;
 
   DuckDuckGoSearch({
     Map<String, String>? headers,
@@ -20,7 +21,9 @@ class DuckDuckGoSearch {
     this.timeout = 10000,
   })  : headers = headers ?? {},
         _dio = Dio(BaseOptions(
-          headers: headers ?? {},
+          headers: headers ?? {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          },
           connectTimeout: Duration(seconds: 30),
           receiveTimeout: Duration(seconds: 30),
         )) {
@@ -28,6 +31,91 @@ class DuckDuckGoSearch {
     _dio.options.headers = this.headers;
     if (proxy != null) {
       // _dio.options.proxy = proxy;
+    }
+
+    // Add request interceptor for sleep between requests
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        await _sleep();
+        return handler.next(options);
+      },
+      onResponse: (response, handler) {
+        final url = response.requestOptions.uri.toString();
+        
+        if (response.statusCode == 200) {
+          return handler.next(response);
+        }
+        
+        // Handle rate limits and related errors
+        if ([202, 301, 403, 400, 429, 418].contains(response.statusCode)) {
+          return handler.reject(
+            DioException(
+              requestOptions: response.requestOptions,
+              error: RateLimitException('$url ${response.statusCode} Ratelimit'),
+              response: response,
+            ),
+          );
+        }
+
+        // Handle all other non-200 responses
+        return handler.reject(
+          DioException(
+            requestOptions: response.requestOptions,
+            error: DuckDuckGoSearchException(
+              '$url return None. params=${response.requestOptions.queryParameters} content=${response.data} data=${response.data}',
+            ),
+            response: response,
+          ),
+        );
+      },
+      onError: (error, handler) {
+        final url = error.requestOptions.uri.toString();
+        
+        // Handle timeout errors
+        if (error.type == DioExceptionType.connectionTimeout ||
+            error.type == DioExceptionType.receiveTimeout ||
+            error.type == DioExceptionType.sendTimeout ||
+            (error.message?.toLowerCase().contains('time') ?? false)) {
+          return handler.reject(
+            DioException(
+              requestOptions: error.requestOptions,
+              error: TimeoutException('$url ${error.runtimeType}: ${error.message}'),
+              type: error.type,
+            ),
+          );
+        }
+
+        // Handle rate limit errors that might come through error callback
+        if (error.response != null && 
+            [202, 301, 403, 400, 429, 418].contains(error.response?.statusCode)) {
+          return handler.reject(
+            DioException(
+              requestOptions: error.requestOptions,
+              error: RateLimitException('${error.requestOptions.uri} ${error.response?.statusCode} Ratelimit'),
+              response: error.response,
+            ),
+          );
+        }
+
+        // Handle all other errors
+        return handler.reject(
+          DioException(
+            requestOptions: error.requestOptions,
+            error: DuckDuckGoSearchException('$url ${error.runtimeType}: ${error.message}'),
+            type: error.type,
+          ),
+        );
+      },
+    ));
+  }
+
+  /// Sleep between API requests to avoid rate limiting
+  Future<void> _sleep([double sleepTime = 0.75]) async {
+    final now = DateTime.now().millisecondsSinceEpoch / 1000.0;
+    final delay = _sleepTimestamp == 0.0 || (now - _sleepTimestamp) >= 20 ? 0.0 : sleepTime;
+    _sleepTimestamp = now;
+    if (delay > 0) {
+      await Future.delayed(Duration(milliseconds: (delay * 1000).round()));
     }
   }
 
