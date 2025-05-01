@@ -5,8 +5,10 @@ import 'package:duckduckgo_search/src/backends/html.dart';
 import 'package:duckduckgo_search/src/backends/json.dart';
 import 'package:duckduckgo_search/src/models/answer.dart';
 import 'package:duckduckgo_search/src/models/search_result.dart';
+import 'package:duckduckgo_search/src/models/image_result.dart';
 import 'dart:convert';
 import 'backends/lite.dart';
+import 'utilities.dart';
 
 class DuckDuckGoSearch {
   final Dio _dio;
@@ -221,5 +223,124 @@ class DuckDuckGoSearch {
     var pageData = json.decode(response.data) as Map<String, dynamic>;
 
     return Answer.fromJson(pageData);
+  }
+
+  /// DuckDuckGo images search. Query params: https://duckduckgo.com/params
+  ///
+  /// Args:
+  ///   keywords: keywords for query.
+  ///   region: wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".
+  ///   safesearch: on, moderate, off. Defaults to "moderate".
+  ///   timelimit: Day, Week, Month, Year. Defaults to null.
+  ///   size: Small, Medium, Large, Wallpaper. Defaults to null.
+  ///   color: color, Monochrome, Red, Orange, Yellow, Green, Blue,
+  ///       Purple, Pink, Brown, Black, Gray, Teal, White. Defaults to null.
+  ///   typeImage: photo, clipart, gif, transparent, line. Defaults to null.
+  ///   layout: Square, Tall, Wide. Defaults to null.
+  ///   licenseImage: any (All Creative Commons), Public (PublicDomain),
+  ///       Share (Free to Share and Use), ShareCommercially (Free to Share and Use Commercially),
+  ///       Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
+  ///       Use Commercially). Defaults to null.
+  ///   maxResults: max number of results. If null, returns results only from the first response.
+  ///
+  /// Returns:
+  ///   List of ImageResult objects with images search results.
+  Future<List<ImageResult>> images(
+    String keywords, {
+    String region = 'wt-wt',
+    String safesearch = 'moderate',
+    String? timelimit,
+    String? size,
+    String? color,
+    String? typeImage,
+    String? layout,
+    String? licenseImage,
+    int? maxResults,
+  }) async {
+    assert(keywords.isNotEmpty, 'keywords is mandatory');
+
+    final vqd = await getVqd(keywords);
+    final safesearchBase = {
+      'on': '1',
+      'moderate': '1',
+      'off': '-1',
+    };
+
+    final filters = [
+      if (timelimit != null) 'time:$timelimit',
+      if (size != null) 'size:$size',
+      if (color != null) 'color:$color',
+      if (typeImage != null) 'type:$typeImage',
+      if (layout != null) 'layout:$layout',
+      if (licenseImage != null) 'license:$licenseImage',
+    ].join(',');
+
+    final payload = {
+      'l': region,
+      'o': 'json',
+      'q': keywords,
+      'vqd': vqd,
+      'f': filters,
+      'p': safesearchBase[safesearch.toLowerCase()],
+    };
+
+    final cache = <String>{};
+    final results = <ImageResult>[];
+
+    try {
+      for (var i = 0; i < 5; i++) {
+        final response = await _dio.get(
+          'https://duckduckgo.com/i.js',
+          queryParameters: payload,
+        );
+
+        final respJson = json.decode(response.data.toString()) as Map<String, dynamic>;
+        final pageData = respJson['results'] as List<dynamic>? ?? [];
+
+        for (final row in pageData) {
+          final imageUrl = row['image'] as String?;
+          if (imageUrl != null && !cache.contains(imageUrl)) {
+            cache.add(imageUrl);
+            results.add(ImageResult(
+              title: row['title'] ?? '',
+              image: normalizeUrl(imageUrl),
+              thumbnail: normalizeUrl(row['thumbnail'] ?? ''),
+              url: normalizeUrl(row['url'] ?? ''),
+              height: row['height'] ?? 0,
+              width: row['width'] ?? 0,
+              source: row['source'] ?? '',
+            ));
+
+            if (maxResults != null && results.length >= maxResults) {
+              return results;
+            }
+          }
+        }
+
+        final next = respJson['next'] as String?;
+        if (next == null || maxResults == null) {
+          return results;
+        }
+
+        // Update payload with next page token
+        payload['s'] = next.split('s=')[1].split('&')[0];
+      }
+
+      return results;
+    } catch (e) {
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            (e.message?.toLowerCase().contains('time') ?? false)) {
+          throw TimeoutException('${e.requestOptions.uri} ${e.runtimeType}: ${e.message}');
+        }
+        if (e.response != null && [202, 301, 403, 400, 429, 418].contains(e.response?.statusCode)) {
+          throw RateLimitException('${e.requestOptions.uri} ${e.response?.statusCode} Ratelimit');
+        }
+        throw DuckDuckGoSearchException('${e.requestOptions.uri} ${e.runtimeType}: ${e.message}');
+      }
+      rethrow;
+    }
   }
 }
