@@ -43,7 +43,8 @@ class NewsResult {
   factory NewsResult.fromMap(Map<String, dynamic> map) {
     final imageUrl = map['image'] as String?;
     final timestamp = map['date'] as int;
-    final date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+    final date =
+        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
 
     return NewsResult(
       date: date,
@@ -58,4 +59,4 @@ class NewsResult {
       useRelevancy: map['use_relevancy'] == 1,
     );
   }
-} 
+}

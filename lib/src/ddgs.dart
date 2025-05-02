@@ -305,8 +305,7 @@ class DuckDuckGoSearch {
         queryParameters: payload,
       );
 
-      final respJson =
-          json.decode(response.data) as Map<String, dynamic>;
+      final respJson = json.decode(response.data) as Map<String, dynamic>;
       final pageData = respJson['results'] as List<dynamic>? ?? [];
 
       for (final row in pageData) {
@@ -399,8 +398,7 @@ class DuckDuckGoSearch {
         queryParameters: payload,
       );
 
-      final respJson =
-          json.decode(response.data) as Map<String, dynamic>;
+      final respJson = json.decode(response.data) as Map<String, dynamic>;
       final pageData = respJson['results'] as List<dynamic>? ?? [];
 
       for (final row in pageData) {

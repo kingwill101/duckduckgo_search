@@ -40,4 +40,4 @@ class ImageResult {
       source: json['source'] ?? '',
     );
   }
-} 
+}

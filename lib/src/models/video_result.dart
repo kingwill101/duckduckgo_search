@@ -11,8 +11,6 @@ class VideoStatistics {
   }
 }
 
-
-
 class VideoResult {
   final String content;
   final String description;
@@ -63,8 +61,6 @@ class VideoResult {
   }
 
   factory VideoResult.fromJson(Map<String, dynamic> json) {
-
-
     return VideoResult(
       content: json['content'],
       description: json['description'],
@@ -78,7 +74,7 @@ class VideoResult {
       publisher: json['publisher'],
       statistics: VideoStatistics.fromJson(json['statistics']),
       title: json['title'],
-      uploader: json['uploader'], 
+      uploader: json['uploader'],
     );
   }
-} 
+}
