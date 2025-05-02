@@ -1,12 +1,49 @@
-# duckduckgo_search
+# DuckDuckGo Search
 
-Search using the DuckDuckGo api
+A Dart package for DuckDuckGo search API. Supports text, image, video, and news search with filters.
 
 ## Features
 
-- searching for text.
-- search suggestions.
-- quick answers
+- Text search
+- Image search with filters (size, color, type, layout, license)
+- Video search with filters (resolution, duration, license)
+- News search with filters (time limit, region)
+- Search suggestions and instant answers
+- Rate limit protection and error handling
+
+## Usage
+
+```dart
+final search = DuckDuckGoSearch();
+
+// Text search
+final results = await search.text('dart programming');
+
+// Image search
+final images = await search.images('nature',
+  size: 'Wallpaper',
+  color: 'Green',
+  layout: 'Wide'
+);
+
+// Video search
+final videos = await search.videos('tutorials',
+  resolution: 'high',
+  duration: 'long'
+);
+
+// News search
+final news = await search.news('technology',
+  timelimit: 'd',  // last 24 hours
+  region: 'wt-wt'
+);
+
+// Suggestions
+final suggestions = await search.suggestions('dart');
+
+// Instant answers
+final answer = await search.answers('population of france');
+```
 
 ## Installation
 
@@ -14,23 +51,20 @@ Add the following dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  duckduckgo_search: ^0.1.1
+  duckduckgo_search: ^0.2.0
 ```
-
 
 Then, run `flutter pub get` or `dart pub get` to install the package.
 
 ### Usage
 Import the package in your Dart file:
-```
-import 'package:duckduckgo_search /duckduckgo_search.dart';
+```dart
+import 'package:duckduckgo_search/duckduckgo_search.dart';
 ```
 
 Perform a search:
 
-
 ```dart
-
 void main() async {
   final results = await DuckDuckGoSearch.text('dartlang');
   for (var result in results) {
@@ -61,7 +95,6 @@ void main() async {
    print(answer.answerAbstract);
 }
 ```
-
 
 ### Contributing
 Contributions are welcome! Please open an issue or submit a pull request on GitHub.

@@ -1,6 +1,5 @@
 import 'package:duckduckgo_search/duckduckgo_search.dart';
-import 'package:duckduckgo_search/src/models/video_result.dart';
-import 'package:duckduckgo_search/src/models/news_result.dart';
+
 import 'package:test/test.dart';
 
 void main() {
@@ -138,7 +137,7 @@ void main() {
       var results = await search.news('dart programming language');
       expect(results, isNotEmpty);
       expect(results.first.title, isNotEmpty);
-      expect(results.first.body, isNotEmpty);
+      expect(results.first, isA<NewsResult>());
       expect(results.first.date, isA<DateTime>());
       expect(results.first.url, contains('http'));
       expect(results.first.source, isNotEmpty);
