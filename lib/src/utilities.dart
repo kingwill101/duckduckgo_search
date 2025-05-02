@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:duckduckgo_search/src/exceptions.dart';
-import 'package:html/parser.dart' as htmlParser;
+import 'package:html/parser.dart' as html_parser;
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,7 +21,7 @@ import 'package:http/http.dart' as http;
 /// The normalized string with HTML tags removed and HTML entities unescaped.
 String normalize(String? rawHtml) {
   if (rawHtml == null || rawHtml.isEmpty) return "";
-  var parsedHtml = htmlParser.parse(rawHtml).body?.text ?? '';
+  var parsedHtml = html_parser.parse(rawHtml).body?.text ?? '';
   return parsedHtml;
 }
 
@@ -54,8 +54,12 @@ String normalizeUrl(String? url) {
 /// Returns:
 ///   Future<String>: The VQD value as a string.
 Future<String> getVqd(String keywords) async {
-  var data = await http
-      .post(Uri.parse('https://duckduckgo.com'), body: {'q': keywords});
+  var data = await http.post(
+      Uri.parse('https://duckduckgo.com?q=${Uri.encodeComponent(keywords)}'),
+      headers: {
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      });
 
   return _extractVqd(data.body, keywords);
 }
